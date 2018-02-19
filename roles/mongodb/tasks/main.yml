@@ -1,0 +1,40 @@
+---
+- name: add 10gen repo file
+  template: src=repo.j2 dest=/etc/yum.repos.d/10gen.repo
+  tags: mongodb
+
+- name: install mongodb
+  yum: name=mongo-10gen-server state=latest
+  tags: mongodb
+
+- name: install mongodb client
+  yum: name=mongo-10gen state=latest
+  tags: mongodb
+
+- name: configure mongodb
+  template: src=mongod.conf.j2 dest=/etc/mongod.conf
+  tags: mongodb
+
+- name: run mongodb
+  service: name=mongod state=started enabled=yes
+  tags: mongodbstart
+
+- name: restict ips to internal ips for production
+  firewalld: zone=public rich_rule='rule family="ipv4" source address="{{ build_server_ip }}" accept' state=enabled permanent=true
+  tags: firewalld
+
+- name: restict ips to internal ips for production
+  firewalld: zone=public rich_rule='rule family="ipv4" source address="{{ staging_server_ip }}" accept' state=enabled permanent=true
+  tags: firewalld
+
+- name: restict ips to internal ips for AWS staging sg
+  firewalld: zone=public rich_rule='rule family="ipv4" source address="{{ production_server_ip }}" accept' state=enabled permanent=true
+  tags: firewalld
+
+- name: restict ips to internal ips for AWS staging sg
+  firewalld: zone=public rich_rule='rule family="ipv4" source address="{{ production2_server_ip }}" accept' state=enabled permanent=true
+  tags: firewalld
+
+- name: Bounce firewalld
+  service: name=firewalld state=restarted
+  tags: firewalld

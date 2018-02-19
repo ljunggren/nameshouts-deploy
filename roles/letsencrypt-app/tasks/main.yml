@@ -1,0 +1,16 @@
+---
+- name: Clone Let's Encrypt into configured directory.
+  git:
+    repo: "{{ letsencrypt_repo }}"
+    dest: "{{ letsencrypt_dir }}"
+    version: "{{ letsencrypt_version }}"
+    update: "{{ letsencrypt_keep_updated }}"
+
+- name: Run Let's Encrypt to generate tokens
+  command: ./letsencrypt-auto certonly -a webroot --webroot-path={{letsencrypt_webroot}} -d {{host_dns_name}} --keep-until-expiring --non-interactive  --agree-tos --email administrator@boozang.com
+  args:
+    chdir: "{{ letsencrypt_dir }}"
+
+- name: Copy updated nginx configuration for https
+  template: src=nginx.conf dest=/etc/nginx/nginx.conf
+  notify: restart nginx

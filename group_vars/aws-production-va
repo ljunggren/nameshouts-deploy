@@ -1,0 +1,15 @@
+# Production configuration VA
+node_env: production-va
+
+git_repo: ssh://git@github.com/ljunggren/bz-dist
+path_to_app: /var/www/bz-dist
+node_url_prefix: /
+
+nginx_ssl_port: 443
+
+branch: master
+
+host_dns_name: app.boozang.com
+
+letsencrypt_webroot: /var/www/letsencrypt
+nginx_ssl_conf_file: /etc/nginx/nginx.conf

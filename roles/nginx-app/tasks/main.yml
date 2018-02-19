@@ -1,0 +1,27 @@
+---
+- name: Install nginx
+  yum: name=nginx state=present
+
+- name: Creates directory
+  file: path=/etc/nginx/ssl/ state=directory
+
+- name: Creates webroot directory
+  file: path={{letsencrypt_webroot}} state=directory
+
+- name: Fix SELinux permissions
+  command: chcon -R -t httpd_sys_content_t {{letsencrypt_webroot}}
+
+- name: Copy nginx configuration for https
+  template: src=nginx.conf dest=/etc/nginx/nginx.conf
+
+- name: insert firewalld rule for nginx
+  firewalld: port={{ nginx_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: insert https firewalld rule for nginx
+  firewalld: port={{ nginx_ssl_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: http service state
+  service: name=nginx state=started enabled=yes
+
+- name: Set SELinux policy httpd_can_network_connect to yes
+  seboolean: name=httpd_can_network_connect state=yes persistent=yes

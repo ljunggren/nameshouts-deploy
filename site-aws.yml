@@ -1,0 +1,84 @@
+---
+- name: This is a play at the top level of a file
+  hosts: all
+  remote_user: ec2-user
+  tasks:
+  - name: Test out some simple output for all environments
+    tags: foo
+    shell: echo "Simple output..."
+
+#  - include: load_balancers.yml
+#  - include: traffic_servers.yml
+#  - include: management_servers.yml
+
+- name: Install nginx and NodeJS on traffic servers
+  hosts: traffic
+  remote_user: ec2-user
+  sudo: yes 
+  roles:
+    - common-aws
+    - nginx-app
+    - letsencrypt
+    - nodejs
+    - application
+
+- name: Install WordPress, MySQL, Nginx, and PHP-FPM
+  hosts: management
+  remote_user: ec2-user
+  sudo: yes
+  roles:
+    - common-aws
+    # - nagios-client
+    - fail2ban
+    - mariadb
+    # nginx-pagespeed
+    - nginx
+    - php-fpm
+    - letsencrypt
+    - wordpress
+
+- name: Install Mongo db servers
+  hosts: database
+  remote_user: ec2-user
+  sudo: yes 
+  roles:
+    - common
+    - redis
+    - mongodb
+
+- name: Install test Wordpress, xvfb, Chrome, Jenkins and Ansible on build servers
+  hosts: build
+  remote_user: ec2-user
+  sudo: yes # On EC2 nodes, this is automatically passwordless. 
+  roles:
+    - common
+#    - nagios-client
+    - fail2ban
+    - mariadb
+    - nginx
+    - php-fpm
+    - wordpress
+    - xvfb
+    - google-chrome
+    - java
+    - jenkins
+    - ansible
+    - nodejs
+
+- name: Install taiga
+  hosts: training
+  remote_user: taiga
+  sudo: yes # On EC2 nodes, this is automatically passwordless. 
+  roles:
+    - taiga
+  vars:
+    domain: taiga.local
+
+
+- name: Install Nagios on monitor nodes
+  hosts: monitor
+  remote_user: root
+  sudo: yes
+  roles:
+    - nagios
+    - nodejs

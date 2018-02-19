@@ -1,0 +1,8 @@
+[trn]
+training.boozang.com
+
+[training:children]
+trn
+
+[nagios]
+mon1-aws.boozang.com

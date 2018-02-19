@@ -1,0 +1,28 @@
+---
+- name: Clone Let's Encrypt into configured directory.
+  tags: ssl
+  git:
+    repo: "{{ letsencrypt_repo }}"
+    dest: "{{ letsencrypt_dir }}"
+    version: "{{ letsencrypt_version }}"
+    update: "{{ letsencrypt_keep_updated }}"
+    force: "yes"
+
+- name: Creates webroot directory
+  tags: ssl
+  file: path={{letsencrypt_webroot}} state=directory
+
+- name: Run Let's Encrypt to generate tokens
+  tags: ssl
+  command: ./letsencrypt-auto certonly -a webroot --webroot-path={{letsencrypt_webroot}} -d {{host_dns_name}} --keep-until-expiring --non-interactive  --agree-tos --email administrator@boozang.com
+  args:
+    chdir: "{{ letsencrypt_dir }}"
+
+- name: Outcomment SSL certificate
+  tags: ssl
+  replace: dest={{ nginx_ssl_conf_file }} regexp='(\s+)#\ ssl_certificate(\s+.*)?$' replace='\1ssl_certificate\2' backup=yes
+
+- name: Outcomment SSL certificate key
+  tags: ssl
+  replace: dest={{ nginx_ssl_conf_file }} regexp='(\s+)#\ ssl_certificate_key(\s+.*)?$' replace='\1ssl_certificate_key\2' backup=yes
+  notify: restart nginx

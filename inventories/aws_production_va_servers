@@ -1,0 +1,7 @@
+[traffic]
+prd1va.boozang.com
+
+[aws-production-va:children]
+traffic
+
+[nagios]
