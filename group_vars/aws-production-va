@@ -13,3 +13,12 @@ host_dns_name: app.boozang.com
 
 letsencrypt_webroot: /var/www/letsencrypt
 nginx_ssl_conf_file: /etc/nginx/nginx.conf
+
+# Database configuration VA
+db_path: /var/lib/mongo
+log_path: /var/log/mongodb
+
+build_server_ip: 192.34.78.149
+staging_server_ip: 192.34.79.98
+production_server_ip: 192.34.78.151
+production2_server_ip: 192.34.78.150
